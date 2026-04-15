@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="card">
+    <h1>Dashboard</h1>
+    <p class="muted">Mock IT admin panel for user management.</p>
+
+    <div class="nav">
+        <a href="/create-user">Create User</a>
+        <a href="/login" class="secondary">Logout</a>
+    </div>
+
+    {% if message %}
+    <div class="message">{{ message }}</div>
+    {% endif %}
+
+    <table>
+        <thead>
+            <tr>
+                <th>Email</th>
+                <th>Name</th>
+                <th>Role</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for user in users %}
+            <tr>
+                <td>{{ user.email }}</td>
+                <td>{{ user.name }}</td>
+                <td>{{ user.role }}</td>
+                <td>
+                    <form class="inline" method="post" action="/reset-password">
+                        <input type="hidden" name="email" value="{{ user.email }}">
+                        <button type="submit">Reset Password</button>
+                    </form>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}
