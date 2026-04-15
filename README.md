@@ -272,7 +272,7 @@ Requests like `create user if not exists` teach the agent:
 
 ## Demo Video
 
-[Loom Video: 4URA Live Automation](https://loom.com/share) ← Add link here after recording
+[Loom Video: 4URA Live Automation](https://www.loom.com/share/70fd74afe7fb4915b8d4da493a0fbb69)
 
 ---
 
