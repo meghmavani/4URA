@@ -102,22 +102,22 @@ Discord Message
 4URA/
 ├── app/
 │   ├── __init__.py
-│   ├── main.py                 # FastAPI app + routes
-│   ├── static/                 # CSS, JS assets
-│   └── templates/              # Login, dashboard, create user forms
+│   ├── main.py
+│   ├── static/
+│   └── templates/
 ├── agent/
 │   ├── __init__.py
-│   └── agent.py                # AuraAgent class (LLM + browser-use)
+│   └── agent.py
 ├── tests/
-│   ├── test_app.py             # API + form tests
-│   ├── test_integration.py      # Agent + app integration
-│   ├── test_system.py          # End-to-end workflows
-│   └── test_agent_features.py  # Bot message handling & exit command
-├── bot.py                       # Discord bot (async event handler)
-├── main_agent.py               # CLI entry point (sync wrapper)
-├── requirements.txt            # Dependencies
-├── .env                        # Environment Variables
-└── README.md                   # This file
+│   ├── test_app.py
+│   ├── test_integration.py
+│   ├── test_system.py
+│   └── test_agent_features.py
+├── bot.py
+├── main_agent.py
+├── requirements.txt
+├── .env
+└── README.md
 ```
 
 ---
@@ -146,10 +146,8 @@ Discord Message
 
 3. **Activate it:**
    ```powershell
-   # Windows PowerShell
    .\.venv\Scripts\Activate.ps1
 
-   # macOS/Linux
    source .venv/bin/activate
    ```
 

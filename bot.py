@@ -47,7 +47,6 @@ def _extract_action_texts(result: object) -> list[str]:
     if not texts:
         raw = str(result).strip()
         if raw:
-            # Last-resort parse from repr-like outputs.
             matches = re.findall(r"extracted_content='([^']+)'", raw)
             texts.extend([m.strip() for m in matches if m.strip()])
 
@@ -120,7 +119,6 @@ def _summarize_result(result: object, task: str, limit: int = 1200) -> str:
         if "success message" in lower_final and "create user" not in lower_task:
             steps.append("Verified success message")
 
-    # De-duplicate while preserving order.
     unique_steps: list[str] = []
     seen: set[str] = set()
     for step in steps:
@@ -174,7 +172,6 @@ async def handle_discord_message(
             try:
                 await shutdown()
             except Exception:
-                # Ignore shutdown exceptions to avoid noisy stack traces during exit.
                 pass
         return "Shutdown requested"
 
@@ -221,7 +218,6 @@ async def main() -> None:
     try:
         await client.start(TOKEN)
     except asyncio.CancelledError:
-        # Cancellation is expected during shutdown paths.
         pass
     finally:
         print("[DiscordBot] Shutdown complete")

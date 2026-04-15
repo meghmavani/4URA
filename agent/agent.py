@@ -71,8 +71,6 @@ class AuraAgent:
         agent_kwargs: dict[str, Any] = {"task": instruction, "llm": self.llm}
         browser_session = self._build_browser_session()
 
-        # Apply optional speed-oriented knobs only if the installed browser-use
-        # version supports them, preserving compatibility across versions.
         supported = set(inspect.signature(self._agent_class).parameters.keys())
 
         if "browser_session" in supported:

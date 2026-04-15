@@ -15,15 +15,12 @@ class TestRouteConsistency:
         """Dashboard Create User link should navigate to valid endpoint."""
         transport = ASGITransport(app=app)
         async with AsyncClient(transport=transport, base_url="http://test") as ac:
-            # Get dashboard
             response = await ac.get("/dashboard")
             assert response.status_code == 200
             
-            # Verify Create User link exists in HTML
             assert 'href="/create-user"' in response.text
             assert "Create User" in response.text
             
-            # Follow the link - should NOT return 404
             response = await ac.get("/create-user")
             assert response.status_code == 200
             assert "Create User" in response.text
@@ -33,7 +30,6 @@ class TestRouteConsistency:
         """Reset password route should exist and accept POST."""
         transport = ASGITransport(app=app)
         async with AsyncClient(transport=transport, base_url="http://test") as ac:
-            # POST to reset-password should NOT return 404
             response = await ac.post("/reset-password", data={"email": "test@example.com"})
             assert response.status_code != 404
             assert response.status_code in (200, 303, 400, 422)
@@ -45,7 +41,6 @@ class TestRouteConsistency:
         async with AsyncClient(transport=transport, base_url="http://test") as ac:
             response = await ac.get("/dashboard")
             
-            # Old routes should not appear in dashboard HTML
             assert "/users/create" not in response.text
             assert "/users/{email}/reset-password" not in response.text
             assert "/users/" not in response.text or "/users/create" not in response.text
@@ -62,11 +57,9 @@ class TestTemplateValidation:
             response = await ac.get("/dashboard")
             assert response.status_code == 200
             
-            # Check form action
             assert 'action="/reset-password"' in response.text
             assert 'method="post"' in response.text
             
-            # Should NOT have old routes
             assert 'action="/users/' not in response.text
 
     @pytest.mark.asyncio
@@ -77,11 +70,9 @@ class TestTemplateValidation:
             response = await ac.get("/create-user")
             assert response.status_code == 200
             
-            # Check form action is correct
             assert 'action="/create-user"' in response.text
             assert 'method="post"' in response.text
             
-            # Check form fields exist
             assert 'name="email"' in response.text
             assert 'name="name"' in response.text
             assert 'name="role"' in response.text
@@ -94,7 +85,6 @@ class TestTemplateValidation:
             response = await ac.get("/dashboard")
             assert response.status_code == 200
             
-            # UI element visibility checks (case-insensitive)
             text_lower = response.text.lower()
             assert "create user" in text_lower
             assert "reset password" in text_lower
@@ -111,19 +101,16 @@ class TestEndToEndFlow:
         """Full workflow: login → dashboard → create user → verify in dashboard."""
         transport = ASGITransport(app=app)
         async with AsyncClient(transport=transport, base_url="http://test") as ac:
-            # Step 1: Login
             login_response = await ac.post(
                 "/login",
                 data={"username": "testuser", "password": "testpass"}
             )
             assert login_response.status_code in (302, 303)
             
-            # Step 2: Navigate to dashboard
             dashboard_response = await ac.get("/dashboard")
             assert dashboard_response.status_code == 200
             assert "Dashboard" in dashboard_response.text
             
-            # Step 3: Create user via form
             create_response = await ac.post(
                 "/create-user",
                 data={
@@ -134,7 +121,6 @@ class TestEndToEndFlow:
             )
             assert create_response.status_code in (200, 303)
             
-            # Step 4: Verify user appears in dashboard
             dashboard_after_create = await ac.get("/dashboard")
             assert dashboard_after_create.status_code == 200
             assert "integration@test.com" in dashboard_after_create.text
@@ -144,17 +130,14 @@ class TestEndToEndFlow:
         """Full workflow: login → dashboard → reset password → verify message."""
         transport = ASGITransport(app=app)
         async with AsyncClient(transport=transport, base_url="http://test") as ac:
-            # Step 1: Login
             await ac.post(
                 "/login",
                 data={"username": "testuser", "password": "testpass"}
             )
             
-            # Step 2: Get dashboard with existing user
             dashboard = await ac.get("/dashboard")
             assert dashboard.status_code == 200
             
-            # Step 3: Reset password for existing user
             reset_response = await ac.post(
                 "/reset-password",
                 data={"email": "alice@example.com"},
@@ -168,13 +151,11 @@ class TestEndToEndFlow:
         """Create a user, then reset their password."""
         transport = ASGITransport(app=app)
         async with AsyncClient(transport=transport, base_url="http://test") as ac:
-            # Login
             await ac.post(
                 "/login",
                 data={"username": "test", "password": "test"}
             )
             
-            # Reset password for existing user (mock data always available)
             reset_response = await ac.post(
                 "/reset-password",
                 data={"email": "alice@example.com"},
@@ -195,11 +176,9 @@ class TestStatusSafety:
             dashboard = await ac.get("/dashboard")
             assert dashboard.status_code == 200
             
-            # Check Create User link
             create_response = await ac.get("/create-user")
             assert create_response.status_code != 404
             
-            # Check Logout link
             logout_response = await ac.get("/login")
             assert logout_response.status_code != 404
 
@@ -208,14 +187,12 @@ class TestStatusSafety:
         """All form submissions should not return 404."""
         transport = ASGITransport(app=app)
         async with AsyncClient(transport=transport, base_url="http://test") as ac:
-            # Login form
             login_response = await ac.post(
                 "/login",
                 data={"username": "test", "password": "test"}
             )
             assert login_response.status_code != 404
             
-            # Create user form
             create_response = await ac.post(
                 "/create-user",
                 data={
@@ -226,7 +203,6 @@ class TestStatusSafety:
             )
             assert create_response.status_code != 404
             
-            # Reset password form
             reset_response = await ac.post(
                 "/reset-password",
                 data={"email": "test@example.com"}
@@ -238,15 +214,12 @@ class TestStatusSafety:
         """Static routes and asset paths should not return unexpected 404s."""
         transport = ASGITransport(app=app)
         async with AsyncClient(transport=transport, base_url="http://test") as ac:
-            # Root should redirect, not 404
             root_response = await ac.get("/", follow_redirects=False)
             assert root_response.status_code in (302, 303)
             
-            # Login exists
             login_response = await ac.get("/login")
             assert login_response.status_code == 200
             
-            # Dashboard exists
             dashboard_response = await ac.get("/dashboard")
             assert dashboard_response.status_code == 200
 
@@ -279,7 +252,6 @@ class TestFormDataHandling:
                 data={"email": "test@example.com"}
             )
             assert response.status_code != 404
-            # Should either succeed or validate
             assert response.status_code in (200, 303, 400, 422)
 
     @pytest.mark.asyncio
@@ -287,15 +259,10 @@ class TestFormDataHandling:
         """Sensitive operations should use POST, not GET."""
         transport = ASGITransport(app=app)
         async with AsyncClient(transport=transport, base_url="http://test") as ac:
-            # Create user should reject GET
             create_get = await ac.get("/create-user/submit")
-            # (This endpoint doesn't exist, validating method safety)
             
-            # Reset password should reject GET
             reset_get = await ac.get("/reset-password")
-            # GET should not process (depends on backend)
             
-            # Verify forms use POST via HTML inspection
             dashboard = await ac.get("/dashboard")
             assert 'method="post"' in dashboard.text
 
@@ -311,9 +278,8 @@ class TestHtmlStructure:
             dashboard = await ac.get("/dashboard")
             assert dashboard.status_code == 200
             
-            # Count reset buttons (should match user count + 1 header row)
             reset_count = dashboard.text.count("Reset Password")
-            assert reset_count >= 5  # At least 5 mock users should have reset buttons
+            assert reset_count >= 5
 
     @pytest.mark.asyncio
     async def test_form_inputs_have_proper_attributes(self):
@@ -323,12 +289,10 @@ class TestHtmlStructure:
             response = await ac.get("/create-user")
             assert response.status_code == 200
             
-            # Check for label associations
             assert 'for="email"' in response.text
             assert 'for="name"' in response.text
             assert 'for="role"' in response.text
             
-            # Check for input IDs
             assert 'id="email"' in response.text
             assert 'id="name"' in response.text
             assert 'id="role"' in response.text
@@ -338,13 +302,11 @@ class TestHtmlStructure:
         """Form submissions and redirects should work correctly."""
         transport = ASGITransport(app=app)
         async with AsyncClient(transport=transport, base_url="http://test") as ac:
-            # Login
             await ac.post(
                 "/login",
                 data={"username": "test", "password": "test"}
             )
             
-            # Create user
             response = await ac.post(
                 "/create-user",
                 data={
@@ -355,10 +317,8 @@ class TestHtmlStructure:
                 follow_redirects=True
             )
             
-            # Should get valid response
             assert response.status_code in (200, 303)
             
-            # Dashboard should still render after operations
             dashboard = await ac.get("/dashboard")
             assert dashboard.status_code == 200
             assert "Dashboard" in dashboard.text

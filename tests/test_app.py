@@ -47,7 +47,6 @@ async def test_reset_password():
         response = await ac.post("/reset-password", data={"email": "john@company.com"})
 
         assert response.status_code in (200, 303)
-        # Follow redirect to dashboard if present
         if response.status_code == 303:
             dashboard = await ac.get("/dashboard")
             assert "password reset" in dashboard.text.lower() or dashboard.status_code == 200

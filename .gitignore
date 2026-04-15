@@ -1,4 +1,3 @@
-# Virtual Environment
 .venv/
 env/
 venv/
@@ -6,7 +5,6 @@ ENV/
 env.bak/
 venv.bak/
 
-# Python
 __pycache__/
 *.py[cod]
 *$py.class
@@ -31,12 +29,10 @@ share/python-wheels/
 *.egg
 MANIFEST
 
-# Environment Variables
 .env
 .env.local
 .env.*.local
 
-# IDE / Editor
 .vscode/
 .idea/
 *.swp
@@ -47,35 +43,29 @@ Thumbs.db
 *.sublime-project
 *.sublime-workspace
 
-# Testing
 .pytest_cache/
 .coverage
 htmlcov/
 .tox/
 .hypothesis/
 
-# Logs
 *.log
 logs/
 
-# OS
 .DS_Store
 .AppleDouble
 .LSOverride
 *.lnk
 
-# Node (if used for frontend)
 node_modules/
 npm-debug.log
 yarn-error.log
 
-# Database/Cache
 *.db
 *.sqlite
 *.sqlite3
 .cache/
 
-# Misc
 .env.example
 *.bak
 *.tmp

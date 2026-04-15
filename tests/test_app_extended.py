@@ -8,14 +8,12 @@ async def test_duplicate_user():
     transport = ASGITransport(app=app)
 
     async with AsyncClient(transport=transport, base_url="http://test") as ac:
-        # Create user first time
         await ac.post("/create-user", data={
             "email": "dup@company.com",
             "name": "Dup",
             "role": "Engineer"
         })
 
-        # Attempt duplicate
         response = await ac.post("/create-user", data={
             "email": "dup@company.com",
             "name": "Dup",
